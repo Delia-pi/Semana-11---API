@@ -1,4 +1,6 @@
 import { Component, inject } from '@angular/core';
+import { Libro } from '../models/libro.model';
+import { OpenLibraryService } from '../services/open-library.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
@@ -22,7 +24,10 @@ import {
   IonButtons,
   IonIcon,
   IonBadge,
-  IonModal
+  IonModal,
+  IonCol,
+  IonGrid,
+  IonRow
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
@@ -63,7 +68,10 @@ import { FeedbackService } from '../services/feedback.service';
     IonButtons,
     IonIcon,
     IonBadge,
-    IonModal
+    IonModal, 
+    IonGrid,
+    IonRow, 
+    IonCol,
   ]
 })
 export class HomePage {
@@ -126,4 +134,38 @@ export class HomePage {
       'Aceptar y Finalizar'
     );
   }
+
+// Servicio que consulta los libros.
+private servicioLibros = inject(OpenLibraryService);
+
+// Lista de libros recibidos de la API.
+libros: Libro[] = [];
+
+// Estados de la consulta.
+estaCargandoLibros: boolean = false;
+mensajeErrorLibros: string = '';
+busquedaRealizada: boolean = false;
+
+// Consultar los libros de romance.
+cargarLibrosRomanticos(): void {
+  this.estaCargandoLibros = true;
+  this.mensajeErrorLibros = '';
+  this.busquedaRealizada = true;
+
+  this.servicioLibros.buscarLibrosRomanticos().subscribe({
+    next: (resultados) => {
+      this.libros = resultados;
+      this.estaCargandoLibros = false;
+    },
+
+    error: (errorApi: unknown) => {
+      console.error('Error al consultar los libros:', errorApi);
+
+      this.mensajeErrorLibros =
+        'No fue posible cargar los libros. Intenta de nuevo.';
+
+      this.estaCargandoLibros = false;
+    }
+  });
+}
 }

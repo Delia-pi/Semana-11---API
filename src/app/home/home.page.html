@@ -160,4 +160,150 @@
     </ng-template>
   </ion-modal>
 
+  <!-- Catálogo de libros de romance -->
+
+<ion-card>
+  <ion-card-header>
+    <ion-card-title>
+      Biblioteca de Romance
+    </ion-card-title>
+
+    <ion-card-subtitle>
+      Libros consultados desde Open Library
+    </ion-card-subtitle>
+  </ion-card-header>
+
+  <ion-card-content>
+
+    <!-- Botón para consultar la API -->
+    <ion-button
+      expand="block"
+      (click)="cargarLibrosRomanticos()"
+      [disabled]="estaCargandoLibros">
+
+      Buscar novelas románticas
+
+    </ion-button>
+
+    <!-- Estado de carga -->
+    @if (estaCargandoLibros) {
+      <p>Buscando libros...</p>
+    }
+
+    <!-- Mensaje de error -->
+    @if (mensajeErrorLibros) {
+      <p>{{ mensajeErrorLibros }}</p>
+
+      <ion-button
+        fill="outline"
+        (click)="cargarLibrosRomanticos()">
+
+        Intentar de nuevo
+
+      </ion-button>
+    }
+
+    <!-- Mensaje inicial -->
+    @if (!busquedaRealizada) {
+      <p>
+        Pulsa el botón para consultar el catálogo.
+      </p>
+    }
+
+    <!-- Mensaje cuando no hay resultados -->
+    @if (
+      busquedaRealizada &&
+      !estaCargandoLibros &&
+      libros.length === 0 &&
+      !mensajeErrorLibros
+    ) {
+      <p>No se encontraron libros.</p>
+    }
+
+    <!-- Mostrar los libros recibidos de la API -->
+    @if (!estaCargandoLibros && libros.length > 0) {
+
+      <ion-grid>
+        <ion-row>
+
+          @for (libro of libros; track libro.clave) {
+
+            <ion-col
+              size="12"
+              size-md="6"
+              size-lg="4">
+
+              <ion-card>
+
+                <!-- Portada del libro -->
+                @if (libro.idPortada) {
+                  <img
+                    [src]="
+                      'https://covers.openlibrary.org/b/id/' +
+                      libro.idPortada +
+                      '-M.jpg'
+                    "
+                    [alt]="'Portada de ' + libro.titulo"
+                    loading="lazy" />
+                } @else {
+                  <ion-card-content>
+                    Portada no disponible.
+                  </ion-card-content>
+                }
+
+                <ion-card-header>
+
+                  <ion-card-title>
+                    {{ libro.titulo }}
+                  </ion-card-title>
+
+                  <ion-card-subtitle>
+                    @if (libro.anioPublicacion) {
+                      Año: {{ libro.anioPublicacion }}
+                    } @else {
+                      Año no disponible
+                    }
+                  </ion-card-subtitle>
+
+                </ion-card-header>
+
+                <ion-card-content>
+
+                  <p>
+                    <strong>Autor:</strong>
+                    {{
+                      libro.autores.length > 0
+                        ? libro.autores.join(', ')
+                        : 'No disponible'
+                    }}
+                  </p>
+
+                  <ion-button
+                    fill="outline"
+                    [href]="
+                      'https://openlibrary.org' + libro.clave
+                    "
+                    target="_blank"
+                    rel="noopener noreferrer">
+
+                    Ver libro
+
+                  </ion-button>
+
+                </ion-card-content>
+
+              </ion-card>
+
+            </ion-col>
+
+          }
+
+        </ion-row>
+      </ion-grid>
+
+    }
+
+  </ion-card-content>
+</ion-card>
+
 </ion-content>
